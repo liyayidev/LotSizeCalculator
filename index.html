@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Forex Trade Calculator</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            margin-top: 50px;
+        }
+        .card {
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .card-header {
+            background-color: green;
+            color: white;
+            border-radius: 15px 15px 0 0;
+            text-align: center;
+            font-size: 1.5rem;
+        }
+        .form-control {
+            border-radius: 8px;
+        }
+        .result-card {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .result-card h5 {
+            font-weight: bold;
+            color: #007bff;
+        }
+        .result-value {
+            font-size: 1.2rem;
+            color: crimson;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Calculator Form -->
+        <div class="card">
+            <div class="card-header">
+                <!-- Forex Trade Calculator -->
+                 Lot Size Calculator
+            </div>
+            <div class="card-body">
+                <form id="tradeForm">
+                    <div class="form-group">
+                        <label for="balance">Account Balance ($)</label>
+                        <input type="number" class="form-control" id="balance" required placeholder="Enter your account balance" value="400">
+                    </div>
+                    <div class="form-group">
+                        <label for="currency">Select Currency</label>
+                        <select class="form-control" id="currency">
+                            <option value="XAUUSD">Gold (XAU/USD)</option>
+                            <option value="EURUSD">EUR/USD</option>
+                            <option value="GBPUSD">GBP/USD</option>
+                            <option value="USDJPY">USD/JPY</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="sl_distance">Stop Loss Distance (Pips)</label>
+                        <input type="number" step="1" class="form-control" id="sl_distance" required placeholder="Enter Stop Loss distance in pips">
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Results Section -->
+        <div class="result-card" id="resultCard" style="display: none;">
+            <h5>Calculation Results:</h5>
+            <div class="row">
+                <div class="col-md-6">
+                    <p>Lot Size: <span class="result-value" id="lot_size">0.00 lots</span></p>
+                </div>
+                <div class="col-md-6">
+                    <p>Stop Loss (SL): <span class="result-value" id="stop_loss">$0.00</span></p>
+                </div>
+                <div class="col-md-6">
+                    <p>Take Profit 1 (TP1): <span class="result-value" id="tp1">$0.00</span></p>
+                </div>
+                <div class="col-md-6">
+                    <p>Take Profit 2 (TP2): <span class="result-value" id="tp2">$0.00</span></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('sl_distance').addEventListener('input', function() {
+            const balance = parseFloat(document.getElementById('balance').value) || 0;
+            const slPips = parseFloat(this.value) || 0;
+            const currency = document.getElementById('currency').value;
+
+            if (balance > 0 && slPips > 0) {
+                calculateResults(balance, slPips, currency);
+            }
+        });
+
+        function calculateResults(balance, slPips, currency) {
+            // Assuming 1 pip = 0.0001 for non-JPY pairs and 0.01 for JPY pairs
+            //const pipValue = currency === 'USDJPY' ? 0.01 : 0.0001;
+            const slDistance = slPips //* pipValue;
+            
+            const riskPercent = 0.02;  // 2% of balance
+            const riskAmount = balance * riskPercent;
+            
+            // Calculate Stop Loss (SL) and Take Profit (TP1, TP2)
+            const tp1RR = 2;  // 1:1 RR
+            const tp2RR = 3;  // 1:3 RR
+
+            //const stopLoss = slDistance;
+            //const tp1 = slDistance * tp1RR;
+            //const tp2 = slDistance * tp2RR;
+            const stopLoss = riskAmount;
+            const tp1 = riskAmount * tp1RR;
+            const tp2 = riskAmount * tp2RR;
+
+            // Calculate lot size
+            const lotSize = (riskAmount / slDistance)/10;
+
+            // Display results
+            document.getElementById('stop_loss').innerText = `$${stopLoss.toFixed(5)}`;
+            document.getElementById('tp1').innerText = `$${tp1.toFixed(5)}`;
+            document.getElementById('tp2').innerText = `$${tp2.toFixed(5)}`;
+            document.getElementById('lot_size').innerText = `${lotSize.toFixed(2)} lots`;
+
+            // Show result card
+            document.getElementById('resultCard').style.display = 'block';
+        }
+    </script>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
